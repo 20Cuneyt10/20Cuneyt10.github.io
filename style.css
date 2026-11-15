@@ -834,6 +834,10 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   height: 100%;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;            /* mobilde sayfa kaydirmasi donusu iptal etmesin */
+  overscroll-behavior: contain;  /* pull-to-refresh / scroll chaining yok */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .globe-container.dragging {
@@ -842,6 +846,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 
 .globe-container canvas {
   display: block;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .globe-hud {

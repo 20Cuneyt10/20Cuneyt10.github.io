@@ -11,7 +11,11 @@ const GLOBE_R = 100;
 const FOV = 45;
 const MIN_DIST = GLOBE_R + 1.15;
 const MAX_DIST = 620;
-const MAX_ANG_SPEED = 2.4;
+const MAX_ANG_STEP = 0.30;   // tek pointer olayinda en fazla aci adimi (rad)
+const MAX_DRAG_PX = 110;     // tek pointer olayinda en fazla piksel tasima
+const SPIN_FRICTION = 6.0;   // birakinca donus sonumu (1/sn)
+const FLING_MIN = 0.35;      // bu aci hizindan yavassa momentum yok (rad/sn)
+const FLING_MAX = 2.8;       // en hizli firlatma (rad/sn)
 const MAX_ZOOM_STEP = 1.35;
 const IDLE_DELAY = 2500;
 const IDLE_SPEED = 0.05;
@@ -109,21 +113,28 @@ export async function create(container) {
   const _right = new THREE.Vector3(), _upAx = new THREE.Vector3();
   let lastRotT = performance.now();
 
-  function rotateBy(dx, dy) {
-    const now = performance.now();
-    const dt = clamp((now - lastRotT) / 1000, 0.008, 0.05);
-    lastRotT = now;
-    const k = radPerPixel();
+  function applyRot(dT, dP) {
     _right.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
     _upAx.setFromMatrixColumn(camera.matrixWorld, 1).normalize();
-    let dT = -dx * k, dP = -dy * k;
-    const mag = Math.hypot(dT, dP), mx = MAX_ANG_SPEED * dt;
-    if (mag > mx) { const s = mx / mag; dT *= s; dP *= s; }
     camDir.applyAxisAngle(_upAx, dT);
     camDir.applyAxisAngle(_right, dP);
     camUp.applyAxisAngle(_right, dP);
     camUp.addScaledVector(camDir, -camUp.dot(camDir)).normalize();
     applyCamera();
+  }
+
+  // Surukleme goruntuye kilitli: aci = piksel * (dunya/piksel).
+  // Zaman tabanli hiz siniri KULLANILMAZ (olay sikligina gore his degisiyordu);
+  // sinir sadece tek olaydaki tasima icin, piksel cinsinden.
+  function rotateBy(dx, dy) {
+    dx = clamp(dx, -MAX_DRAG_PX, MAX_DRAG_PX);
+    dy = clamp(dy, -MAX_DRAG_PX, MAX_DRAG_PX);
+    const k = radPerPixel();
+    let dT = -dx * k, dP = -dy * k;
+    const mag = Math.hypot(dT, dP);
+    if (mag > MAX_ANG_STEP) { const s = MAX_ANG_STEP / mag; dT *= s; dP *= s; }
+    applyRot(dT, dP);
+    return [dT, dP];
   }
   function zoomBy(f) {
     f = clamp(f, 1 / MAX_ZOOM_STEP, MAX_ZOOM_STEP);
@@ -135,17 +146,27 @@ export async function create(container) {
   let lastInteract = performance.now();
   const touch = () => { lastInteract = performance.now(); };
   const pointers = new Map();
-  let lastX = 0, lastY = 0, dragMoved = 0, pinchStart = 0, pinchDist0 = 0;
+  let lastX = 0, lastY = 0, dragMoved = 0, pinchStart = 0;
+  let lastMoveT = performance.now(), inertT = 0, inertP = 0, pinched = false;
   const dom = renderer.domElement;
+
+  // Mobil/masaustu ayni davransin: tarayici bu yuzeyde kaydirma/yakinlastirma
+  // hareketini almaz, aksi halde pointercancel gelip donus kesiliyor.
+  dom.style.touchAction = 'none';
+  dom.style.webkitUserSelect = 'none';
+  dom.style.userSelect = 'none';
 
   dom.addEventListener('pointerdown', (e) => {
     touch();
     try { dom.setPointerCapture(e.pointerId); } catch (_) {}
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 1) { lastX = e.clientX; lastY = e.clientY; dragMoved = 0; }
-    else if (pointers.size === 2) {
+    inertT = 0; inertP = 0;
+    lastMoveT = performance.now();
+    if (pointers.size === 1) {
+      lastX = e.clientX; lastY = e.clientY; dragMoved = 0; pinched = false;
+    } else if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
-      pinchStart = Math.hypot(a.x - b.x, a.y - b.y); pinchDist0 = dist;
+      pinchStart = Math.hypot(a.x - b.x, a.y - b.y); pinched = true;
     }
     container.classList.add('dragging');
   });
@@ -153,38 +174,67 @@ export async function create(container) {
   dom.addEventListener('pointermove', (e) => {
     const p = pointers.get(e.pointerId);
     if (!p) return;
-    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    touch();
     p.x = e.clientX; p.y = e.clientY;
     if (pointers.size === 1) {
-      if (dx || dy) { rotateBy(dx, dy); dragMoved += Math.abs(dx) + Math.abs(dy); lastX = e.clientX; lastY = e.clientY; }
+      let dx = e.clientX - lastX, dy = e.clientY - lastY;
+      if (dx || dy) {
+        const now = performance.now();
+        const dtm = clamp((now - lastMoveT) / 1000, 0.008, 0.12);
+        lastMoveT = now;
+        const [dT, dP] = rotateBy(dx, dy);
+        // momentum icin aci hizi (rad/sn), asiri ziplamayi kirp
+        inertT = clamp(dT / dtm, -FLING_MAX, FLING_MAX);
+        inertP = clamp(dP / dtm, -FLING_MAX, FLING_MAX);
+        dragMoved += Math.abs(dx) + Math.abs(dy);
+        lastX = e.clientX; lastY = e.clientY;
+      }
     } else if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y);
-      if (pinchStart > 0) zoomBy(pinchDist0 / d);
-      pinchStart = d; pinchDist0 = dist;
+      // iki parmagin arasi KAC PIKSELE degistiyse o oran kadar zoom
+      // (eskiden dist/piksel oranlaniyordu, zoom neredeyse hic calismiyordu)
+      if (pinchStart > 4 && d > 4) zoomBy(pinchStart / d);
+      pinchStart = d;
     }
   });
 
-  function endPointer(e) {
+  function endPointer(e, keepMomentum) {
     pointers.delete(e.pointerId);
-    if (!pointers.size) container.classList.remove('dragging');
     if (pointers.size < 2) pinchStart = 0;
+    if (!pointers.size) {
+      container.classList.remove('dragging');
+      if (!keepMomentum) { inertT = 0; inertP = 0; }
+    } else {
+      // iki parmaktan tek parmaga gecince sicrama olmasin
+      const [a] = [...pointers.values()];
+      lastX = a.x; lastY = a.y; lastMoveT = performance.now();
+      inertT = 0; inertP = 0;
+    }
     try { dom.releasePointerCapture(e.pointerId); } catch (_) {}
   }
   dom.addEventListener('pointerup', (e) => {
-    const wasClick = pointers.size === 1 && dragMoved < 6;
+    const wasClick = pointers.size === 1 && dragMoved < 6 && !pinched;
     const cx = e.clientX, cy = e.clientY;
-    endPointer(e);
+    endPointer(e, true);
     if (wasClick) handleClick(cx, cy);
   });
-  dom.addEventListener('pointercancel', endPointer);
-  dom.addEventListener('pointerleave', endPointer);
+  dom.addEventListener('pointercancel', (e) => endPointer(e, false));
+  dom.addEventListener('lostpointercapture', (e) => { if (pointers.has(e.pointerId)) endPointer(e, false); });
+  // pointerleave YOK: capture varken kenardan cikinca suruklemeyi kesiyordu
 
   dom.addEventListener('wheel', (e) => {
     e.preventDefault();
+    let dy = e.deltaY;
+    if (e.deltaMode === 1) dy *= 16;        // satir modu (Firefox)
+    else if (e.deltaMode === 2) dy *= 100;  // sayfa modu
+    if (!dy) return;
     const alt = Math.max(0.4, dist - GLOBE_R);
-    const rate = 0.0011 * (0.35 + 0.65 * Math.min(1, alt / 140));
-    zoomBy(Math.exp(clamp(e.deltaY, -300, 300) * rate));
+    // trackpad pinch (ctrlKey) cok daha kucuk delta uretir, ayri katsayi
+    const rate = e.ctrlKey
+      ? 0.0045
+      : 0.0011 * (0.35 + 0.65 * Math.min(1, alt / 140));
+    zoomBy(Math.exp(clamp(dy, -300, 300) * rate));
   }, { passive: false });
 
   // ---------- tik -> sonifikasyon ----------
@@ -515,6 +565,16 @@ export async function create(container) {
     const dt = Math.min(0.05, (now - lastFrame) / 1000);
     lastFrame = now;
 
+    // birakinca momentum: dokunmatikte/uzaktan farede donus "yapis yapis" kalmasin
+    if (!pointers.size && (inertT || inertP)) {
+      if (pinched || Math.abs(inertT) + Math.abs(inertP) < FLING_MIN * 0.5) { inertT = 0; inertP = 0; }
+      else {
+        applyRot(inertT * dt, inertP * dt);
+        const f = Math.exp(-SPIN_FRICTION * dt);
+        inertT *= f; inertP *= f;
+      }
+    }
+
     if (!pointers.size && !state.playing) {
       const idle = now - lastInteract;
       if (idle > IDLE_DELAY) {
@@ -604,6 +664,8 @@ export async function create(container) {
     setParams(p) { Object.assign(SFP, p); if (region) render(); },
     getRegion: () => region,
     getState: () => ({ ...state, dist: dist, zoomPicked: pickZoom() }),
+    // QA/olcum icin: kamera yonu ve mesafe (dondurme testleri bunu okur)
+    getCam: () => ({ x: camDir.x, y: camDir.y, z: camDir.z, dist }),
     onState(fn) { listeners.onState = fn; emit(); },
     canvasEl: () => region && region.canvas,
     flyTo(lat, lng) {
