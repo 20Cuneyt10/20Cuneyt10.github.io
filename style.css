@@ -2050,3 +2050,72 @@ html, body {
   margin-top: -40px;
   margin-bottom: 0;
 }
+
+/* ---------- MOBIL: dokunma hedefleri ve okunur punto (2026-11) ----------
+   Sikayet: "icons are too small on mobile, everything generally too small".
+   Kural: dokunulan her sey >= 44 px, etiketler >= 12 px, govde >= 15 px. */
+@media (max-width: 760px) {
+  .nav-menu-btn { width: 46px; height: 46px; }
+  .nav-brand { font-size: 20px; letter-spacing: .16em; }
+  .nav-btn { font-size: 13px; padding: 15px 20px; }
+
+  /* 3D PLANET kaplamalari */
+  .globe-hud { width: min(300px, calc(100% - 24px)); padding: 12px 14px; top: 12px; left: 12px; }
+  .hud-label { font-size: 12px; min-width: 56px; }
+  .hud-value { font-size: 13.5px; line-height: 1.6; }
+  .hud-btn { font-size: 12.5px; min-height: 46px; padding: 10px 14px; }
+  /* ipucu arama kutusunun USTUNE: 390 px'de ikisi ayni satirda cakisiyordu */
+  .globe-hint { font-size: 11px; line-height: 1.5; right: 12px; bottom: 76px; left: 12px; }
+  .globe-zoom { right: 12px; gap: 10px; }
+  .globe-zoom button { width: 50px; height: 50px; font-size: 22px; }
+  #globeSearchInput { height: 48px; font-size: 16px; padding: 0 14px; }  /* 16px: iOS kendiliginden zoom yapmasin */
+  .globe-search { right: 12px; bottom: 12px; left: 12px; }
+  .globe-search-list li { font-size: 14px; padding: 12px 14px; }
+
+  /* kaset destesi */
+  .key { font-size: 12.5px; min-height: 46px; }
+  .deck-years { gap: 5px; }
+  .deck-years button { font-size: 12px; padding: 10px 0; min-height: 42px; }
+  .player-header { font-size: 12px; }
+  .vfd-screen { font-size: 13px; }
+  .deck-meta { font-size: 13px; line-height: 1.55; }
+  .slot-placeholder { font-size: 12.5px; }
+  .deck-progress { height: 10px; margin-top: 8px; }
+  .deck-tape-label .dtl-meta { font-size: 10px; }
+  .arc-card .f-left .spine { font-size: 9px; }
+
+  /* bilgi kartlari / galeri */
+  .content > section > .button { font-size: 12.5px; min-height: 44px; padding: 10px 12px; }
+  .carousel-hint, .gallery-hint { font-size: 11.5px; }
+  /* galeri oklari: 44 px altina inmesin */
+  .cylinder-carousel { --carousel-control-button-width: 3rem; --carousel-control-button-height: 3rem; }
+  .cassette-label, .cassette-bottom { font-size: 11px; }
+  .year-sub, .year-tag { font-size: 11px; }
+  .di-label, .di-meta, .di-src { font-size: 10.5px; }
+
+  /* uzun metin sayfalari */
+  .intro-kicker { font-size: 11px; }
+  .intro-lede { font-size: 17px; line-height: 1.5; }
+  .intro-why h2 { font-size: 12.5px; }
+  .intro-why p { font-size: 15px; line-height: 1.6; }
+  .intro-enter, .intro-link { font-size: 12.5px; min-height: 46px; }
+  .how-num { font-size: 13px; }
+  .how-lead { font-size: 16px; line-height: 1.55; }
+  .how-card h2 { font-size: 21px; }
+  .how-card p { font-size: 15px; line-height: 1.6; }
+  .how-fine { font-size: 13px; }
+  .faq-item h2 { font-size: 19px; }
+  .faq-item p { font-size: 15px; line-height: 1.6; }
+  .faq-links { font-size: 13px; }
+  .credit-list a, .credit-list span { font-size: 13px; line-height: 1.5; }
+  .skip-link { font-size: 13px; }
+}
+
+/* dokunmatik her cihaz (tablet dahil): hedefler 44 px altina inmesin */
+@media (pointer: coarse) {
+  .nav-menu-btn { min-width: 46px; min-height: 46px; }
+  .hud-btn { min-height: 46px; }
+  .globe-zoom button { min-width: 50px; min-height: 50px; }
+  .deck-years button { min-height: 42px; }
+  .content > section > .button { min-height: 44px; }
+}
