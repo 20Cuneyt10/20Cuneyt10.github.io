@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>NASA Dossier // VOXTERRA</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background:
+        radial-gradient(ellipse at 50% 0, #303b34 0, transparent 55%),
+        #171d1b;
+      color: #e8e2d3;
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 34px 20px 64px;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 920px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border: 1px solid #b4aa93;
+      background: #d9d1bd;
+      color: #1f2a24;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+
+    .back-btn:hover { background: #1f2a24; color: #d9d1bd; }
+
+    .terminal-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      color: #8f9a90;
+      text-align: right;
+    }
+
+    .dossier-card {
+      width: 100%;
+      max-width: 920px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 30px 32px 34px;
+      border: 1px solid #b4aa93;
+      background: #ddd4c0;
+      color: #263029;
+      box-shadow: 0 24px 46px #050a0875;
+    }
+
+    .dossier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding-bottom: 12px;
+    }
+
+    .dossier-code {
+      margin-bottom: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: #7a7059;
+    }
+
+    .dossier-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -.01em;
+      color: #1f2a24;
+    }
+
+
+    .hero-image {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background-position: center;
+      background-size: cover;
+      border: 1px solid #26302945;
+    }
+
+    .hero-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 30px #1a211b55;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-box {
+      padding: 12px 14px;
+      background: #0000000f;
+      border-left: 3px solid #8d3f22;
+    }
+
+    .stat-label {
+      margin-bottom: 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .13em;
+      color: #6b6450;
+    }
+
+    .stat-val {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 19px;
+      line-height: 1.2;
+      color: #1f2a24;
+    }
+
+    .text-content {
+      font-size: 13px;
+      line-height: 1.78;
+      color: #38443c;
+    }
+
+    .text-content h3 {
+      margin-bottom: 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: .02em;
+      color: #1f2a24;
+    }
+
+    .text-content p { margin: 0; }
+    .text-content br { display: none; }
+
+    @media (max-width: 640px) {
+      .dossier-card { padding: 20px 18px 24px; }
+      .hero-image { height: 210px; }
+      .dossier-header { flex-direction: column; gap: 8px; }
+      .terminal-badge { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">◀ RETURN TO VOXTERRA</a>
+    <div class="terminal-badge">NASA EARTH OBSERVATORY // ARCHIVE DOSSIER</div>
+  </div>
+
+  <div class="dossier-card">
+    <div class="dossier-header">
+      <h1 class="dossier-title" id="topicTitle">LOADING INTEL...</h1>
+    </div>
+
+    <div class="hero-image" id="topicImage"></div>
+
+    <div class="stats-grid" id="topicStats">
+      <!-- stat boxes are filled by JS -->
+    </div>
+
+    <div class="text-content" id="topicContent">
+      <!-- description is filled by JS -->
+    </div>
+  </div>
+
+  <script>
+    // scientific NASA archive database, 8 topics
+    const database = {
+      temperature: {
+        code: "ARCHIVE REF: NASA-GISTEMP-V4",
+        title: "GLOBAL SURFACE TEMPERATURE",
+        image: "./img/cards/06-1504386106331-.jpg",
+        stats: [
+          { label: "WARMING SINCE 1880", val: "+1.17 °C" },
+          { label: "RECORD HIGH DECADE", val: "2014 - 2024" },
+          { label: "SENSOR SYSTEM", val: "MODIS / AIRS" }
+        ],
+        content: `
+          <h3>ANALYSIS &amp; OBSERVATION SUMMARY</h3>
+          <p>NASA GISTEMP puts the rise in global mean surface temperature at roughly 1.2 degrees Celsius since the late nineteenth century. Most of that warming lines up with the carbon dioxide and other greenhouse gases released by human activity.</p>
+          <p>A warmer atmosphere holds more water vapour, which raises the odds of hard droughts, violent storms and wildfires across the planet.</p>
+        `
+      },
+      aerosols: {
+        code: "ARCHIVE REF: NASA-CALIPSO-LIDAR",
+        title: "ATMOSPHERIC AEROSOLS & PARTICULATES",
+        image: "./img/cards/12-1534088568595-.jpg",
+        stats: [
+          { label: "PRIMARY SOURCES", val: "DUST / ASH / SMOG" },
+          { label: "OPTICAL DEPTH (AOD)", val: "0.24 HIGH (ANOMALY)" },
+          { label: "MONITORING CRAFT", val: "CALIPSO / PACE" }
+        ],
+        content: `
+          <h3>ATMOSPHERIC SCATTERING DYNAMICS</h3>
+          <p>Aerosols are microscopic solid particles and liquid droplets suspended in the air. Desert dust storms, volcanic eruptions, coal plants and wildfires are their main sources, and each one loads the atmosphere differently.</p>
+          <p>Bright aerosols bounce sunlight back to space and cool the surface through the albedo effect. Dark aerosols such as black carbon do the opposite, trapping heat and pushing local warming further.</p>
+        `
+      },
+      arctic: {
+        code: "ARCHIVE REF: NASA-NSIDC-CRYOSPHERE",
+        title: "ARCTIC SEA ICE MINIMUM EXTENT",
+        image: "./img/cards/08-1517760444937-.jpg",
+        stats: [
+          { label: "DECIMAL DECLINE RATE", val: "-12.2% / DECADE" },
+          { label: "THICK ICE LOSS", val: "> 70% SINCE 1980" },
+          { label: "SURVEILLANCE", val: "ICESat-2 / CRYOSAT" }
+        ],
+        content: `
+          <h3>CRYOSPHERE DEGRADE &amp; FEEDBACK LOOP</h3>
+          <p>Arctic sea ice melts every summer and freezes again each winter. NASA satellite records show the late summer minimum shrank by more than 12 percent per decade over the last 40 years.</p>
+          <p>As the white ice disappears it exposes dark ocean water. Dark water absorbs sunlight instead of reflecting it, which warms the surface and melts the remaining ice faster. That is the loop behind the numbers.</p>
+        `
+      },
+      deforestation: {
+        code: "ARCHIVE REF: NASA-LANDSAT-CANOPY",
+        title: "TROPICAL DEFORESTATION & CANOPY LOSS",
+        image: "./img/cards/14-1542273917363-.jpg",
+        stats: [
+          { label: "GLOBAL TREE LOSS", val: "~10M HA / YEAR" },
+          { label: "CARBON SINK DEFICIT", val: "-2.4 Gt CO2e" },
+          { label: "SAT IMAGING", val: "LANDSAT 8 & 9" }
+        ],
+        content: `
+          <h3>BIOSPHERE COLLAPSE &amp; EMISSION RELEASE</h3>
+          <p>Rainforests are the planet's largest carbon sink and its richest habitat. Land cleared for farming, timber and mining releases millions of tonnes of stored carbon back into the air.</p>
+          <p>NASA's Landsat and GEDI instruments measure canopy loss in three dimensions, tracking biomass change across the tropics at a resolution of centimetres.</p>
+        `
+      },
+      carbon: {
+        code: "ARCHIVE REF: NASA-OCO2-TRACEGAS",
+        title: "ATMOSPHERIC CARBON DIOXIDE (CO2)",
+        image: "./img/cards/16-1611273426858-.jpg",
+        stats: [
+          { label: "GLOBAL CONCENTRATION", val: "426.5 PPM" },
+          { label: "PRE-INDUSTRIAL BASE", val: "280 PPM" },
+          { label: "CORE OBSERVATORY", val: "OCO-2 & OCO-3" }
+        ],
+        content: `
+          <h3>GREENHOUSE EFFECT INTENSIFICATION</h3>
+          <p>Carbon dioxide absorbs the infrared radiation leaving the surface and holds that heat in the atmosphere. Since the industrial era began, atmospheric CO2 has climbed at a rate not seen in the ice core record.</p>
+          <p>The Orbiting Carbon Observatory missions map where emissions originate and which oceans or forests still absorb them, city by city and season by season.</p>
+        `
+      },
+      snow: {
+        code: "ARCHIVE REF: NASA-MODIS-SNOW",
+        title: "SNOW & ICE COVER EXTENT",
+        image: "./img/cards/04-1483921020237-.jpg",
+        stats: [
+          { label: "SPRING SNOW DECLINE", val: "-5.8% / DECADE" },
+          { label: "ALBEDO FEEDBACK", val: "CRITICAL SHIFT" },
+          { label: "MONITORING SENSOR", val: "MODIS / VIIRS" }
+        ],
+        content: `
+          <h3>CRYOSPHERE REFLECTIVITY &amp; WATER STORAGE</h3>
+          <p>Spring snow cover in the northern hemisphere melts earlier and covers less ground with each decade. Snow is one of the planet's great natural mirrors, reflecting sunlight back to space and keeping the surface cool.</p>
+          <p>When that snowpack retreats it exposes dark soil and rock, which speeds up local warming, and it threatens the river basins that supply drinking and irrigation water for billions of people.</p>
+        `
+      },
+      rain: {
+        code: "ARCHIVE REF: NASA-GPM-PRECIP",
+        title: "GLOBAL PRECIPITATION ANOMALY",
+        image: "./img/cards/10-1519692933481-.jpg",
+        stats: [
+          { label: "ATMOSPHERIC CAPACITY", val: "+7% PER 1°C" },
+          { label: "EXTREME STORMS", val: "+18% FREQUENCY" },
+          { label: "MISSION FLEET", val: "GPM / TRMM" }
+        ],
+        content: `
+          <h3>WATER CYCLE ACCELERATION &amp; EXTREMES</h3>
+          <p>A warmer atmosphere holds about 7 percent more water vapour for every degree of warming. That pushes the water cycle harder, with deeper droughts and desertification on one side and destructive floods and monsoon swings on the other.</p>
+          <p>NASA's Global Precipitation Measurement mission maps rain and snow worldwide in three dimensions, so hydrologists can watch the imbalance build in near real time.</p>
+        `
+      },
+      flux: {
+        code: "ARCHIVE REF: NASA-CARBON-FLUX",
+        title: "TERRESTRIAL CARBON FLUX",
+        image: "./img/cards/02-1451187580459-.jpg",
+        stats: [
+          { label: "NET SINK CAPACITY", val: "29% EMISSIONS" },
+          { label: "OCEAN ABSORPTION", val: "26% EMISSIONS" },
+          { label: "ANALYTICAL TOOL", val: "GEOS-CF MODEL" }
+        ],
+        content: `
+          <h3>CARBON SINK DYNAMICS &amp; ECOSYSTEM EXCHANGE</h3>
+          <p>Carbon flux is the net amount of CO2 exchanged between the atmosphere and land or ocean ecosystems. Natural sinks still absorb about half of what humanity emits each year.</p>
+          <p>Rising temperatures and deforestation are turning some large forest basins from sinks into sources. NASA models follow that exchange continuously because the balance decides how fast the atmosphere fills.</p>
+        `
+      }
+      
+    };
+
+    // URL parametresinden konuyu oku (?topic=temperature vb.)
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTopicKey = urlParams.get('topic') || 'temperature';
+    const data = database[currentTopicKey] || database.temperature;
+
+    // fill the page
+    document.getElementById('topicTitle').innerText = data.title;
+    document.getElementById('topicImage').style.backgroundImage = `url('${data.image}')`;
+    document.getElementById('topicContent').innerHTML = data.content;
+
+    const statsGrid = document.getElementById('topicStats');
+    statsGrid.innerHTML = '';
+    data.stats.forEach(item => {
+      const box = document.createElement('div');
+      box.className = 'stat-box';
+      box.innerHTML = `<div class="stat-label">${item.label}</div><div class="stat-val">${item.val}</div>`;
+      statsGrid.appendChild(box);
+    });
+  </script>
+</body>
+</html>

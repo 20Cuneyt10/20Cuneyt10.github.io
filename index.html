@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>VOXTERRA</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="faq.js" defer></script>
+  <script type="importmap">
+    { "imports": { "three": "./libs/three.module.js" } }
+  </script>
+  <script type="module" src="boot.js"></script>
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <nav class="navbar">
+    <button class="nav-brand" id="navBrandBtn" onclick="switchPage('intro')" aria-label="About this project">VOXTERRA</button>
+    <button class="nav-menu-btn" id="navMenuBtn" aria-expanded="false" aria-controls="navLinks" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-btn" id="navDeckBtn" onclick="switchPage('deck')">CASSETTE DECK</button>
+      <button class="nav-btn" id="navGlobeBtn" onclick="switchPage('globe')">3D PLANET</button>
+      <button class="nav-btn" id="navCardsBtn" onclick="switchPage('cards')">INFORMATION CARDS</button>
+      <button class="nav-btn" id="navGalleryBtn" onclick="switchPage('gallery')">3D GALLERY</button>
+      <button class="nav-btn" id="navHowBtn" onclick="switchPage('howto')">HOW IT WORKS</button>
+      <button class="nav-btn" id="navFaqBtn" onclick="switchPage('faq')">FAQ</button>
+    </div>
+  </nav>
+
+  <!-- ================= PAGE 0: INTRO / WHY ================= -->
+  <div class="page-container active" id="pageIntro">
+    <div class="intro-wrap">
+      <header class="intro-hero">
+        <span class="intro-kicker">EARTH DATA, ON TAPE</span>
+        <h1>VOXTERRA</h1>
+        <p class="intro-lede">Eight NASA datasets, pressed onto cassettes. Insert a tape and the
+           planet plays back as sound.</p>
+        <div class="intro-actions">
+          <button class="intro-enter" onclick="switchPage('deck')">ENTER THE DECK</button>
+          <button class="intro-link" onclick="switchPage('faq')">Read the FAQ</button>
+        </div>
+      </header>
+
+      <section class="intro-why">
+        <h2>WHY WE BUILT IT THIS WAY</h2>
+        <div class="intro-points">
+          <article>
+            <h3>Not everyone can read a map</h3>
+            <p>At least 2.2 billion people live with a near or distance vision impairment, and about
+               43 million are blind. A temperature curve or a sea ice map usually reaches people
+               through the eye alone.</p>
+          </article>
+          <article>
+            <h3>Sound carries the same data</h3>
+            <p>Sonification maps the numbers to pitch, rhythm and texture. Anything we can show as an
+               image we can also play, so the same dataset can be read by ear on an ordinary laptop
+               with a keyboard.</p>
+          </article>
+          <article>
+            <h3>Interaction is what people remember</h3>
+            <p>Choosing an era, loading a tape and hearing sea ice turn into a chord stays with an
+               audience far longer than a static figure on a slide. That is why the data is a deck
+               and not a dashboard.</p>
+          </article>
+        </div>
+        <p class="intro-source">VOXTERRA is a project by ANKATECH. Figures: WHO fact sheet on
+           blindness and vision impairment; GBD 2019 Blindness and Vision Impairment
+           Collaborators, Lancet Global Health 2021 (43.3 million people blind in 2020).</p>
+      </section>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 1: DECK & CASSETTES ================= -->
+  <div class="page-container" id="pageDeck">
+    <aside class="deck-info" id="deckInfo">
+      <span class="di-label" id="diLabel">ARCHIVE TAPE</span>
+      <h2 class="di-name" id="diName">SURFACE TEMPERATURE</h2>
+      <span class="di-src" id="diSrc">GISS GISTEMP v4</span>
+      <p class="di-about" id="diAbout"></p>
+      <div class="di-meta"><span id="diEra">ERA 2020</span><span id="diSpan">1880 to 2025</span></div>
+    </aside>
+    <div class="player-chassis">
+      <div class="player-header">
+        <div class="status-light" id="statusLight"></div>
+      </div>
+      <div class="vfd-screen" id="trackDisplay">NO CASSETTE INSERTED</div>
+      <div class="deck-slot-wrapper">
+        <div class="deck-door" id="deckDoor">
+          <span class="slot-placeholder" id="slotPlaceholder">[ DROP CASSETTE HERE ]</span>
+          <div class="deck-view" id="deckView">
+            <img id="deckImage" alt="">
+            <div class="deck-head" id="deckHead"></div>
+          </div>
+          <div class="deck-progress"><i></i></div>
+        </div>
+      </div>
+      <div class="piano-keys">
+        <button class="key" id="btnPlay">PLAY</button>
+        <button class="key" id="btnStop">STOP</button>
+      </div>
+      <div class="deck-years" id="deckYears">
+        <button data-year="1990">1990</button>
+        <button data-year="1995">1995</button>
+        <button data-year="2000">2000</button>
+        <button data-year="2005">2005</button>
+        <button data-year="2010">2010</button>
+        <button data-year="2015">2015</button>
+        <button data-year="2020" class="on">2020</button>
+        <button data-year="2025">2025</button>
+      </div>
+      <div class="deck-meta" id="deckMeta">centre a tape, click it to load the deck</div>
+    </div>
+
+    <!-- Cassettes: quarter-circle fan to the right of the deck -->
+    <div class="arc-rack" id="arcRack">
+      <div class="arc-stage" id="arcStage">
+        <div class="arc-strip" id="arcStrip"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 2: 3D GLOBE ================= -->
+  <div class="page-container" id="pageGlobe">
+    <div class="globe-wrapper">
+      <div class="globe-container" id="globeContainer"></div>
+
+      <div class="globe-hud">
+        <div class="hud-row"><span class="hud-label">REGION</span><span class="hud-value" id="hudCoords">— click the globe —</span></div>
+        <div class="hud-row"><span class="hud-label">AUDIO</span><span class="hud-value" id="hudMeta">waiting for a tape</span></div>
+        <div class="hud-buttons">
+          <button class="hud-btn" id="globePlay">▶ PLAY</button>
+          <button class="hud-btn" id="globeStop">■ STOP</button>
+          <button class="hud-btn" id="globeEngine" title="v2: spectral · v3: musical">engine: v3</button>
+        </div>
+      </div>
+      <div class="globe-zoom">
+        <button id="globeZoomIn" aria-label="Zoom in">+</button>
+        <button id="globeZoomOut" aria-label="Zoom out">&#8722;</button>
+      </div>
+      <div class="globe-hint">CLICK: listen to a region · DRAG: rotate · WHEEL or + and - : zoom</div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 3: INFORMATION CARDS ================= -->
+<!-- ================= PAGE 3: INFORMATION CARDS (5 KART) ================= -->
+<div class="page-container" id="pageCards">
+  <div class="carousel-wrapper">
+    <div class="content" id="cardContent">
+
+      <!-- 1. SICAKLIK -->
+      <section id="card-temperature" style="--position: 0;" onclick="handleCardClick('temperature')">
+        <div class="image"></div>
+        <div class="title">GLOBAL TEMPERATURE</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('temperature')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 2. AEROSOL -->
+      <section id="card-aerosols" style="--position: 1;" onclick="handleCardClick('aerosols')">
+        <div class="image"></div>
+        <div class="title">ATMOSPHERIC AEROSOLS</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('aerosols')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 3. ARCTIC ICE -->
+      <section id="card-arctic" style="--position: 2;" onclick="handleCardClick('arctic')">
+        <div class="image"></div>
+        <div class="title">ARCTIC SEA ICE</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('arctic')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 4. DEFORESTATION -->
+      <section id="card-deforestation" style="--position: 3;" onclick="handleCardClick('deforestation')">
+        <div class="image"></div>
+        <div class="title">DEFORESTATION</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('deforestation')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 5. CARBON DIOXIDE (CO2) -->
+      <section id="card-carbon" style="--position: 4;" onclick="handleCardClick('carbon')">
+        <div class="image"></div>
+        <div class="title">CARBON DIOXIDE (CO2)</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('carbon')">VIEW DOSSIER</div>
+      </section>
+      <!-- 6. SNOW & ICE COVER (SNOW) -->
+      <section id="card-snow" style="--position: 5;" onclick="handleCardClick('snow')">
+        <div class="image"></div>
+        <div class="title">SNOW & ICE COVER</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('snow')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 7. PRECIPITATION (RAIN) -->
+      <section id="card-rain" style="--position: 6;" onclick="handleCardClick('rain')">
+        <div class="image"></div>
+        <div class="title">GLOBAL PRECIPITATION</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('rain')">VIEW DOSSIER</div>
+      </section>
+
+      <!-- 8. CO2 AKISI (CO2FLUX) -->
+      <section id="card-flux" style="--position: 7;" onclick="handleCardClick('flux')">
+        <div class="image"></div>
+        <div class="title">CARBON FLUX (CO2FLUX)</div>
+        <div class="button" onclick="event.stopPropagation(); redirectTo('flux')">VIEW DOSSIER</div>
+      </section>
+
+
+    </div>
+
+    <div class="carousel-hint">◀ DRAG TO ROTATE // CLICK CARD FOR NASA INTEL ▶</div>
+  </div>
+</div>
+
+  <!-- ================= PAGE 4: 3D CYLINDER GALLERY (8 YIL KARTI) ================= -->
+  <div class="page-container" id="pageGallery">
+    <div class="cylinder-carousel">
+      <div class="carousel-control-button left"><input type="radio" name="carousel-control-input"></div>
+      <div class="carousel-control-button right"><input type="radio" name="carousel-control-input" checked></div>
+
+
+      <div class="carousel-rotation-direction">
+        <ul class="carousel-item-wrapper" style="--_num-elements: 8">
+          <li class="carousel-item" style="--_index: 1;" onclick="selectYearAndOpenDeck('1990')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">1990</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 2;" onclick="selectYearAndOpenDeck('1995')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">1995</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 3;" onclick="selectYearAndOpenDeck('2000')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2000</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 4;" onclick="selectYearAndOpenDeck('2005')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2005</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 5;" onclick="selectYearAndOpenDeck('2010')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2010</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 6;" onclick="selectYearAndOpenDeck('2015')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2015</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 7;" onclick="selectYearAndOpenDeck('2020')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2020</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-item" style="--_index: 8;" onclick="selectYearAndOpenDeck('2025')">
+            <div class="year-card">
+              <span class="year-tag">ARCHIVE ERA</span>
+              <span class="year-number">2025</span>
+              <span class="year-sub">4 DATA TAPES</span>
+            </div>
+          </li>
+          <li class="carousel-ground"></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= PAGE 5: HOW IT WORKS ================= -->
+  <div class="page-container" id="pageHowto">
+    <div class="how-wrap">
+      <header class="how-head">
+        <h1>HOW IT WORKS</h1>
+        <p>Eight NASA datasets turned into sound, era by era. Pick a year, load a tape,
+           listen to the planet, or click anywhere on the globe and hear that patch of Earth.</p>
+      </header>
+
+      <div class="how-grid">
+        <article class="how-card">
+          <span class="how-num">01</span>
+          <h2>TAPE → SOUND</h2>
+          <p>Every cassette holds one dataset for one era: <b>GISTEMP</b> surface temperature,
+             <b>SVS 5196</b> model carbon dioxide, <b>AMSR2</b> sea ice, <b>MODIS</b> snow cover,
+             <b>IGBP</b> land cover, <b>IMERG</b> precipitation, <b>MODIS</b> aerosol and net
+             ecosystem CO2 exchange.</p>
+          <p>When a tape is inserted its source arrives once, as a CSV column, an animation frame or a
+             cached satellite tile, and is resampled to a <b>512 × 512</b> frame matrix. That image is
+             read as a spectrum: each column becomes a chord, each brightness value a harmonic. The
+             result is rendered into an audio buffer in the browser, with no backend and no
+             pre-recorded files.</p>
+          <p>Eight tapes exist in total, but a rack only carries the ones whose data reaches that
+             era: 1990 has two, 2010 has six, 2025 has all eight. Drag the fan or use the arrows to
+             reach one, click it once to centre it and once more to drop it into the deck.</p>
+        </article>
+
+        <article class="how-card">
+          <span class="how-num">02</span>
+          <h2>THE PLANET: TWO ENGINES</h2>
+          <p>Click a point on the sphere and the app loads the matching satellite tile
+             (z/x/y), downsamples it to the same frame matrix and sonifies it.</p>
+          <p><b>v2, spectral.</b> 16 partials per column, glide between frames, 4.8 kHz low-pass,
+             mono. It reads like a spectrogram played left to right: an X-ray of the image.</p>
+          <p><b>v3, musical.</b> The same matrix is quantised to an A-minor pentatonic ladder,
+             capped at 6 partials, softened attacks and stereo spread. Same data, but it sounds
+             like an instrument instead of a scan.</p>
+          <p>Switch with the <b>motor</b> button in the globe HUD; the tape deck always uses the
+             musical engine.</p>
+        </article>
+
+        <article class="how-card">
+          <span class="how-num">03</span>
+          <h2>CARDS → DOSSIERS</h2>
+          <p>Eight topics sit on a draggable strip: temperature, aerosols, sea ice, forests, carbon,
+             snow, rain, flux. Each card opens a dossier with the numbers behind the sound:
+             what was measured, by which mission, and what the trend means.</p>
+          <p>Dossiers are built from the same source files, so the numbers on the page always agree
+             with what you just heard.</p>
+        </article>
+
+        <article class="how-card">
+          <span class="how-num">04</span>
+          <h2>YEAR CAPSULES</h2>
+          <p>The gallery is a cylinder of eras, 1990 → 2025. Clicking a capsule loads that era's
+             tapes into the deck, so you can hear how the same measurement changes across
+             three and a half decades of satellite records.</p>
+        </article>
+
+        <article class="how-card how-card-wide">
+          <span class="how-num">05</span>
+          <h2>DATA &amp; CREDITS</h2>
+          <p class="how-lead">Every cassette and every globe tile comes from a public NASA source.
+             Links go straight to the dataset or product page.</p>
+
+          <div class="credits">
+            <ul class="credit-list">
+              <li><a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener">GISS GISTEMP v4</a>
+                  <span>surface temperature anomaly, 1880 to now</span></li>
+              <li><a href="https://svs.gsfc.nasa.gov/5196/" target="_blank" rel="noopener">SVS 5196 DYAMOND</a>
+                  <span>model carbon dioxide field, monthly</span></li>
+              <li><a href="https://nsidc.org/data/au_si12" target="_blank" rel="noopener">NSIDC AMSR2 sea ice</a>
+                  <span>daily sea ice concentration, 12.5 km</span></li>
+              <li><a href="https://nsidc.org/data/mod10a1" target="_blank" rel="noopener">MODIS MOD10A1</a>
+                  <span>snow cover index, daily NDSI</span></li>
+              <li><a href="https://lpdaac.usgs.gov/products/mcd12q1v061/" target="_blank" rel="noopener">MODIS MCD12Q1</a>
+                  <span>yearly IGBP land cover classes</span></li>
+              <li><a href="https://gpm.nasa.gov/data/imerg" target="_blank" rel="noopener">GPM IMERG</a>
+                  <span>global precipitation rate, half hourly</span></li>
+              <li><a href="https://modis-atmos.gsfc.nasa.gov/products/aerosol" target="_blank" rel="noopener">MODIS MOD04</a>
+                  <span>aerosol optical depth, daily</span></li>
+              <li><a href="https://climate.nasa.gov/vital-signs/carbon-dioxide/" target="_blank" rel="noopener">NASA carbon cycle</a>
+                  <span>net ecosystem CO2 exchange reference</span></li>
+            </ul>
+
+            <ul class="credit-list">
+              <li><a href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA GIBS</a>
+                  <span>tile server that feeds the 3D globe</span></li>
+              <li><a href="https://visibleearth.nasa.gov/collection/1484/blue-marble" target="_blank" rel="noopener">Blue Marble</a>
+                  <span>base imagery behind the sphere</span></li>
+              <li><a href="https://www.nasa.gov/sonifications/" target="_blank" rel="noopener">NASA sonifications</a>
+                  <span>reference work for data you can hear</span></li>
+              <li><a href="https://codepen.io/NiklasKnaack/pen/abrOMLY" target="_blank" rel="noopener">Niklas Knaack</a>
+                  <span>3D cylinder carousel in the gallery</span></li>
+              <li><a href="https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment" target="_blank" rel="noopener">WHO vision impairment</a>
+                  <span>2.2 billion people live with a vision impairment</span></li>
+              <li><a href="https://pubmed.ncbi.nlm.nih.gov/33275950/" target="_blank" rel="noopener">GBD 2019, Lancet Global Health</a>
+                  <span>43.3 million people blind in 2020</span></li>
+            </ul>
+          </div>
+
+          <p class="how-fine">Sonification: additive synthesis written for this project,
+             v2 spectral engine and v3 musical engine, both running in the browser with Web Audio.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 6: FAQ ================= -->
+  <div class="page-container" id="pageFaq">
+    <div class="how-wrap">
+      <header class="how-head">
+        <h1>FAQ</h1>
+        <p>Short answers about the data, the sound and what runs where.</p>
+      </header>
+      <div class="faq-list" id="faqList"></div>
+    </div>
+  </div>
+
+</body>
+</html>
