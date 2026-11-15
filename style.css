@@ -2089,6 +2089,21 @@ html, body {
   .carousel-hint, .gallery-hint { font-size: 11.5px; }
   /* galeri oklari: 44 px altina inmesin */
   .cylinder-carousel { --carousel-control-button-width: 3rem; --carousel-control-button-height: 3rem; }
+  /* 3D GALLERY: telefonda silindir capi kucuktu (68vw), kartlar birbirinin icine giriyordu.
+     Kural: komsu kart merkezleri arasi = 2R*sin(180/N) >= kart genisligi * 1.05
+     (390 px: d=499 -> aralik 191 px, kart 156 px). */
+  #pageGallery {
+    --carousel-diameter: min(40rem, 128vw);
+    --carousel-item-width: clamp(7.5rem, 40vw, 10rem);
+    --carousel-item-height: clamp(10.5rem, 56vw, 14rem);
+    --carousel-3d-perspective: 900px;
+  }
+  /* 860 px blogu oklari ekranin disina tasiyordu (left:-2.75rem). Silindir
+     viewport'tan genis (128vw) oldugu icin oklar kaba konumla ekran disinda kaliyor:
+     tasma payi = (128vw - 100vw)/2 = 14vw, oklar onun ustune oturur. */
+  #pageGallery .cylinder-carousel .carousel-control-button { z-index: 40; }
+  #pageGallery .cylinder-carousel .carousel-control-button.left { left: calc(14vw + .35rem); }
+  #pageGallery .cylinder-carousel .carousel-control-button.right { right: calc(14vw + .35rem); }
   .cassette-label, .cassette-bottom { font-size: 11px; }
   .year-sub, .year-tag { font-size: 11px; }
   .di-label, .di-meta, .di-src { font-size: 10.5px; }
