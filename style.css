@@ -2109,6 +2109,10 @@ html, body {
   .faq-links { font-size: 13px; }
   .credit-list a, .credit-list span { font-size: 13px; line-height: 1.5; }
   .skip-link { font-size: 13px; }
+
+  /* mobil tarayici adres cubugu 100vh'yi sismesin (destekleyen yerde dvh) */
+  .page-container { min-height: calc(100dvh - 100px); }
+  #pageGlobe { height: calc(100dvh - 100px); }
 }
 
 /* dokunmatik her cihaz (tablet dahil): hedefler 44 px altina inmesin */
