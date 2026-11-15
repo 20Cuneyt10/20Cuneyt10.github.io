@@ -1,33 +1,38 @@
-EARTH INFO JUKEBOX — NASA SPACE APPS
-====================================
+VOXTERRA - NASA EARTH DATA, ON TAPE
+==================================
 
-Bu klasoru baska bir bilgisayara kopyaladiktan sonra:
+Sekiz NASA veri seti, kasetlere basildi. Kaseti tak, PLAY'e bas: ayni veri
+hem goruntu hem ses olarak calar.
 
-  1) Python 3 kurulu olsun (3.9+; baska hicbir sey gerekmiyor)
-  2) Terminalde bu klasore gir:
+KURULUM (tek gereksinim: Python 3)
+  1) Terminalde bu klasore gir:
 
-       cd jukebox
+       cd voxterra
        python3 server.py 8132
 
-  3) Tarayicida ac:
+  2) Tarayicida ac:
 
        http://127.0.0.1:8132/index.html
 
 Sayfalar (ust menuden):
-  CASSETTE DECK      - kaset yayi (deck'e tiklayarak kaset tak, PLAY)
-  3D PLANET          - gercek uydu kuresi + bolge sesi
+  CASSETTE DECK      - kaset yayi; ortala, tikla, deck'e tak, PLAY
+  3D PLANET          - gercek uydu kuresi; tara, + / - ile yakinlas, bolgeye tikla
   INFORMATION CARDS  - suruklenebilir kart seridi (NASA dossileri)
   3D GALLERY         - yil kapsulleri silindiri (tikla -> o yilin kasetleri)
+  HOW IT WORKS       - motorlar, veri kaynaklari, krediler
+  FAQ                - kisa sorular ve cevaplar
 
 NOTLAR
-  - Kurulum/paket yoneticisi gerekmez, internet olmadan da calisir
-    (tiles/ ve nasa/ klasorleri paketle birlikte geliyorsa).
-  - "offline" pakette harita dosyalari (tiles/, tiles_lr/) dahildir.
-  - Internet varsa eksik veri dosyalari nasa_indir.py ile indirilebilir.
+  - Kurulum/paket yoneticisi gerekmez. tiles/ ve nasa/ klasorleri paketteyse
+    internet olmadan da calisir (offline paket).
   - Ses icin tarayicida bir kez tiklama gerekir (autoplay kilidi).
-  - Kasetler NASA veri setlerini (GISTEMP, OCO-2, NSIDC, GRACE ...)
-    indirip sonifiye eder; ilk takista birkac saniye surer.
+  - Kasetler NASA verilerini (GISS GISTEMP, SVS 5196, GIBS/AMSR2, MODIS,
+    IMERG) kullanir; ilk takista birkac saniye surer, sonrasi onbellekten acilir.
+  - Eksik veri dosyalari internet varken: python3 nasa_indir.py
+
+PROJE
+  VOXTERRA - ANKATECH
 
 REFERANS
-  Niklas Knaack — 3D carousel (3D gallery sayfasi)
+  Niklas Knaack - 3D carousel (3D GALLERY sayfasi)
   https://codepen.io/NiklasKnaack/pen/abrOMLY
