@@ -48,6 +48,14 @@ function switchPage(pageName) {
     else b.removeAttribute('aria-current');
   });
 
+  // odak yonetimi: ekran okuyucu yeni sayfanin basina gelsin
+  const mainEl = document.getElementById('main');
+  if (mainEl && pages[pageName]) {
+    mainEl.focus({ preventScroll: true });
+    const h = pages[pageName].querySelector('h1');
+    if (h) announce(h.textContent.replace(/\s+/g, ' ').trim() + ' page');
+  }
+
   // mobil sheet'i kapat
   const links = document.getElementById('navLinks'), menuBtn = document.getElementById('navMenuBtn');
   if (links) links.classList.remove('open');
@@ -207,6 +215,15 @@ document.addEventListener('DOMContentLoaded', () => {
     </svg>`;
   }
 
+  // ekran okuyucu duyurusu: tek bir canli bolge, hizli degisimlerde spam yapmaz
+  let announceTimer = 0;
+  function announce(msg) {
+    const live = document.getElementById('srLive');
+    if (!live) return;
+    clearTimeout(announceTimer);
+    announceTimer = setTimeout(() => { live.textContent = msg; }, 220);
+  }
+
   function build(tapes) {
     arcStrip.innerHTML = '';
     items = tapes.map((tp, i) => {
@@ -224,7 +241,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="f-gloss"></div>
           </div></div>
         </div></div>`;
+      // ekran okuyucu + klavye: kart gercek bir dugme gibi davranir
+      el.tabIndex = 0;
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label',
+        `${tp.name}, ${tp.sub}${tp.from ? ', data from ' + tp.from : ''}. ` +
+        'Enter ile ortala ve decke tak.');
       el.addEventListener('click', () => onCardClick(i));
+      el.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onCardClick(i); }
+      });
       arcStrip.appendChild(el);
       return { el, tp, idx: i };
     });
@@ -266,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const idx = Math.max(0, Math.min(items.length - 1, Math.round(shift)));
     if (idx !== shownIdx) {
       shownIdx = idx;
+      const t0 = items[idx] && items[idx].tp;
+      if (t0) announce(`${t0.name}. ${t0.sub}. ${insertedIdx === idx ? 'In the deck.' : 'Press Enter to load it.'}`);
       if (deckMeta && insertedIdx < 0) {
         deckMeta.textContent = `${items[idx].tp.name} · ${items[idx].tp.sub} · click to load the deck`;
       }
@@ -288,6 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fill = document.querySelector('.deck-progress i');
     if (head) head.style.left = (pr * 100).toFixed(2) + '%';
     if (fill) fill.style.width = (pr * 100).toFixed(2) + '%';
+    const bar = fill && fill.parentElement;
+    if (bar) bar.setAttribute('aria-valuenow', Math.round(pr * 100));
     if (statusLight) statusLight.classList.toggle('active', !!s.playing);
     if (btnPlay) btnPlay.classList.toggle('pressed', !!s.playing);
   }
@@ -478,6 +508,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('pageDeck').classList.contains('active')) return;
     if (e.key === 'ArrowRight') targetShift = snapShift(targetShift + 1);
     if (e.key === 'ArrowLeft') targetShift = snapShift(targetShift - 1);
+
+    // klavye ile deck kullanimi: Enter = ortadaki kaseti tak, Escape = cikar
+    const onControl = e.target && e.target.closest && e.target.closest('button, [role="button"], input, select, a');
+    if (e.key === 'Enter' && !onControl) {
+      e.preventDefault();
+      if (insertedIdx >= 0) btnPlay.click();
+      else onCardClick(Math.max(0, Math.min(items.length - 1, Math.round(shift))));
+    }
+    if (e.key === 'Escape' && insertedIdx >= 0) { e.preventDefault(); ejectTape(true); }
   });
 
   /* --- deck butonlari --- */
@@ -544,6 +583,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  /* --- tiklanabilir kartlari klavye/ekran okuyucu icin dugme yap --- */
+  function upgradeClickables() {
+    const els = document.querySelectorAll('.carousel-item, #cardContent section');
+    els.forEach((el) => {
+      if (el.dataset.a11y) return;
+      el.dataset.a11y = '1';
+      el.tabIndex = 0;
+      el.setAttribute('role', 'button');
+      if (!el.getAttribute('aria-label')) {
+        const label = (el.querySelector('.year-number') && el.querySelector('.year-number').textContent)
+          || (el.querySelector('.title') && el.querySelector('.title').textContent) || el.textContent.trim().slice(0, 40);
+        el.setAttribute('aria-label', label.trim() + '. Open.');
+      }
+      el.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); el.click(); }
+      });
+    });
+  }
+  upgradeClickables();
 
   /* --- 3D GALLERY: her yil kartindaki kaset sayisi TAPES'ten gelsin (sabit "4" yanlisti) --- */
   function syncGalleryCounts() {

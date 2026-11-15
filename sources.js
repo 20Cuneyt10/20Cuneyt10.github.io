@@ -151,7 +151,7 @@ export const TAPES = [
     about: 'Global mean surface temperature anomaly measured against the 1951 to 1980 baseline, monthly since 1880.',
     href: 'https://data.giss.nasa.gov/gistemp/', lat: 0, lng: 0, span: 180, from: 1880 },
   { key: 'CO2', name: 'CARBON DIOXIDE', sub: 'SVS 5196 DYAMOND', kind: 'frames',
-    about: 'Column averaged CO2 from a global DYAMOND model run, played as 27 consecutive time steps.',
+    about: 'Column averaged CO2 from a global DYAMOND model run, played as 27 consecutive time steps. One run, so it looks the same in every era.',
     href: 'https://svs.gsfc.nasa.gov/5196/', lat: 10, lng: 20, span: 120, from: 1880 },
   { key: 'ICE', name: 'SEA ICE', sub: 'NSIDC · AMSR2 concentration', kind: 'gibs',
     about: 'Share of the ocean covered by ice, read by the AMSR2 microwave radiometer since 2012.',

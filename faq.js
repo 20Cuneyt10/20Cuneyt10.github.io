@@ -78,7 +78,6 @@ window.JUKE_FAQ = [
         .map(([label, href]) => `<a href="${href}" target="_blank" rel="noopener">${label}</a>`)
         .join(' · ');
       return `<article class="faq-item">
-        <span class="faq-num">${String(i + 1).padStart(2, '0')}</span>
         <h2>${item.q}</h2>
         <p>${item.a}</p>
         ${links ? `<p class="faq-links">${links}</p>` : ''}

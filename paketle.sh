@@ -18,7 +18,7 @@ mkdir -p "$DEST"
 for f in *.js *.html *.css *.py *.sh .gitignore README*; do
   [[ -e "$f" ]] && cp -rL "$f" "$DEST/" || true
 done
-cp -rL libs nasa img "$DEST/"
+cp -rL libs nasa img data "$DEST/"
 rm -f "$DEST/nasa/co2_anim.mp4"
 mkdir -p "$DEST/tiles" "$DEST/tiles_lr"
 if [[ $WITH_TILES == 1 ]]; then

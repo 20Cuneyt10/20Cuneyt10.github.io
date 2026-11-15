@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>VOXTERRA</title>
@@ -17,9 +17,10 @@
   <script type="module" src="boot.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
-  <nav class="navbar">
+  <nav class="navbar" aria-label="Main">
     <button class="nav-brand" id="navBrandBtn" onclick="switchPage('intro')" aria-label="About this project">VOXTERRA</button>
     <button class="nav-menu-btn" id="navMenuBtn" aria-expanded="false" aria-controls="navLinks" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -33,6 +34,10 @@
       <button class="nav-btn" id="navFaqBtn" onclick="switchPage('faq')">FAQ</button>
     </div>
   </nav>
+
+  <div id="srLive" class="sr-only" role="status" aria-live="polite"></div>
+
+  <main id="main" tabindex="-1">
 
   <!-- ================= PAGE 0: INTRO / WHY ================= -->
   <div class="page-container active" id="pageIntro">
@@ -98,7 +103,7 @@
             <img id="deckImage" alt="">
             <div class="deck-head" id="deckHead"></div>
           </div>
-          <div class="deck-progress"><i></i></div>
+          <div class="deck-progress" role="progressbar" aria-label="Playback position" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
         </div>
       </div>
       <div class="piano-keys">
@@ -144,7 +149,14 @@
         <button id="globeZoomIn" aria-label="Zoom in">+</button>
         <button id="globeZoomOut" aria-label="Zoom out">&#8722;</button>
       </div>
-      <div class="globe-hint">CLICK: listen to a region · DRAG: rotate · WHEEL or + and - : zoom</div>
+      <div class="globe-search" role="search">
+        <label class="sr-only" for="globeSearchInput">Search a place by name</label>
+        <input id="globeSearchInput" type="text" placeholder="search a place" autocomplete="off"
+               spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list"
+               aria-controls="globeSearchList">
+        <ul id="globeSearchList" class="globe-search-list" role="listbox" aria-label="Places" hidden></ul>
+      </div>
+      <div class="globe-hint">SEARCH a place · CLICK: listen to a region · DRAG: rotate · WHEEL or + and - : zoom</div>
     </div>
   </div>
 
@@ -406,6 +418,8 @@
       <div class="faq-list" id="faqList"></div>
     </div>
   </div>
+
+  </main>
 
 </body>
 </html>

@@ -11,6 +11,50 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* --- erisilebilirlik temelleri --- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 12px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: #ddd4c0;
+  color: #1f2a24;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-decoration: none;
+  transition: top .15s ease;
+}
+
+.skip-link:focus {
+  top: 10px;
+  outline: 2px solid #ef9c72;
+  outline-offset: 2px;
+}
+
+/* klavye ile gezinen herkes nerede oldugunu gormeli */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+.arc-card:focus-visible {
+  outline: 2px solid #ef9c72;
+  outline-offset: 3px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -199,7 +243,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   justify-content: flex-start;
   gap: 0;
   padding-top: clamp(28px, 4.5vh, 56px);   /* player nav'a yapismasin */
-  overflow: hidden;
+  overflow-y: auto;                        /* kisa ekran / %200 zoom: icerik kirpilmesin */
+  overflow-x: hidden;
 }
 
 #pageDeck.active {
@@ -1632,6 +1677,64 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .credits { grid-template-columns: 1fr; gap: 0 0; }
 }
 
+/* ---- 3D PLANET: yer arama (ekran okuyucu/klavye icin sade, siritmayan) ---- */
+.globe-search {
+  position: absolute;
+  z-index: 9;
+  left: clamp(16px, 3vw, 40px);
+  bottom: clamp(46px, 7vh, 74px);
+  width: min(260px, 42vw);
+}
+
+#globeSearchInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #4a544c;
+  border-radius: 3px;
+  background: #1b241f;
+  color: #e2dfcf;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+#globeSearchInput::placeholder { color: #7f8b81; letter-spacing: .08em; }
+
+#globeSearchInput:focus {
+  outline: 2px solid #ef9c72;
+  outline-offset: 2px;
+  border-color: #ef9c72;
+}
+
+.globe-search-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 6px);
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  border: 1px solid #4a544c;
+  border-radius: 3px;
+  background: #1b241f;
+  box-shadow: 0 14px 24px #080d0ac0;
+}
+
+.globe-search-list li {
+  padding: 7px 10px;
+  color: #c8d0c6;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.globe-search-list li .cs-country { color: #7f8b81; }
+
+.globe-search-list li[aria-selected="true"],
+.globe-search-list li:hover {
+  background: #2b3a32;
+  color: #efe8d6;
+}
+
 /* ---- INTRO / WHY sayfasi (acilis ekrani) ---- */
 #pageIntro.active {
   display: block;
@@ -1781,19 +1884,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   box-shadow: 0 18px 30px #080d0a70;
 }
 
-.faq-num {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  color: #7a7059;
-}
-
 .faq-item h2 {
   margin: 0 0 10px;
-  padding-right: 40px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 17px;
   font-weight: 400;
